@@ -1,0 +1,1064 @@
+:root {
+    --bg-color: #0a0a0a;
+    --text-color: #ededed;
+    --accent-color: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(20, 20, 20, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --blob-color: #ffffff;
+
+    --font-body: 'Inter', sans-serif;
+    --font-display: 'Oswald', sans-serif;
+    --font-pixel: 'Press Start 2P', cursive;
+
+    --ease-custom: cubic-bezier(.44, -0.08, 0, 1.38);
+    --ease-smooth: ease-in-out;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+html.lenis,
+html.lenis body {
+    height: auto;
+}
+
+.lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+    overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+    pointer-events: none;
+}
+
+/* Background & Ambient */
+#background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.grain-overlay {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+}
+
+#blobs-container {
+    position: absolute;
+    inset: 0;
+    filter: blur(80px);
+}
+
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: drift 20s infinite alternate ease-in-out;
+}
+
+.blob-1 {
+    width: 400px;
+    height: 400px;
+    background: #4a4a4a;
+    top: 10%;
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.blob-2 {
+    width: 300px;
+    height: 300px;
+    background: #2a2a2a;
+    bottom: 20%;
+    right: 10%;
+    animation-delay: -5s;
+}
+
+.blob-3 {
+    width: 250px;
+    height: 250px;
+    background: #5a5a5a;
+    top: 40%;
+    left: 60%;
+    animation-delay: -10s;
+}
+
+@keyframes drift {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate(30px, -50px) scale(1.1);
+    }
+}
+
+/* Navbar */
+#navbar {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    max-width: 95vw;
+    /* Start with safe max-width */
+    z-index: 100;
+    white-space: nowrap;
+    /* Prevent wrapping */
+    background: rgba(10, 10, 10, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 50px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.4s var(--ease-custom), width 0.4s var(--ease-custom), padding 0.4s var(--ease-custom);
+}
+
+#navbar.scaled {
+    transform: translateX(-50%) scale(1.05);
+    /* Subtle scale */
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+#navbar:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Liquid scale effect for blob */
+#navbar.scaled #nav-blob {
+    transform: scale(1.1);
+    opacity: 1;
+    filter: brightness(1.2);
+}
+
+#nav-list {
+    display: flex;
+    list-style: none;
+    position: relative;
+    z-index: 2;
+}
+
+.nav-item {
+    cursor: pointer;
+    padding: 10px 20px;
+    color: var(--text-color);
+    font-size: 14px;
+    font-weight: 500;
+    position: relative;
+    transition: color 0.3s;
+    white-space: nowrap;
+    z-index: 2;
+    /* Ensure text is above blob */
+}
+
+.nav-item.active {
+    color: #000;
+}
+
+#nav-blob {
+    position: absolute;
+    background: #ededed;
+    border-radius: 40px;
+    z-index: 1;
+    transition: transform 0.5s var(--ease-custom), width 0.5s var(--ease-custom), height 0.5s var(--ease-custom), top 0.5s var(--ease-custom), left 0.5s var(--ease-custom), opacity 0.3s;
+    opacity: 0.9;
+}
+
+#navbar.mini {
+    padding: 5px 15px;
+    border-radius: 30px;
+}
+
+#navbar.expanded-hover {
+    padding: 10px;
+    border-radius: 50px;
+}
+
+#nav-mini-text {
+    color: var(--text-color);
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 1;
+    transform: translate(0);
+    filter: blur(0);
+    transition: transform 0.3s var(--ease-custom), opacity 0.3s var(--ease-custom), filter 0.3s var(--ease-custom);
+}
+
+/* Sections */
+.section {
+    min-height: 100vh;
+    padding: 100px 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Section Transitions & Layout */
+.section-content {
+    opacity: 0;
+    transform: translateX(50px);
+    filter: blur(10px);
+    transition: opacity 0.8s var(--ease-smooth), transform 0.8s var(--ease-smooth), filter 0.8s var(--ease-smooth);
+
+    /* Layout fix */
+    width: 100%;
+    max-width: 1400px;
+    /* Constrain width */
+    margin: 0 auto;
+    padding: 0 40px;
+    /* Add internal breathing room */
+}
+
+.section.active-view .section-content {
+    opacity: 1;
+    transform: translateX(0);
+    filter: blur(0);
+}
+
+/* Hero */
+#hero {
+    display: flex;
+    flex-direction: row;
+    /* Desktop default */
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+}
+
+.hero-left {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.hero-greeting {
+    font-family: var(--font-display);
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.hero-bio {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 600px;
+    opacity: 0.9;
+}
+
+.hero-right {
+    flex: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-image {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 20px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Projects */
+#projects {
+    padding-top: 50px;
+}
+
+.project-card {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 50px auto;
+    /* Default margin for scroll */
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    min-height: 80vh;
+    /* Make them tall enough */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.project-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(3px) brightness(0.4);
+    z-index: 0;
+    transition: transform 0.5s ease;
+}
+
+.project-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.project-pretext {
+    background: #fff;
+    color: #000;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.project-title {
+    font-size: 3rem;
+    margin: 10px 0;
+    text-transform: uppercase;
+}
+
+.font-8bit {
+    font-family: var(--font-pixel);
+    font-size: 2rem;
+}
+
+.font-stretched {
+    font-family: var(--font-display);
+    transform: scaleX(1.5);
+    max-width: 65%;
+    /* Constrain width to force wrapping on scaled text */
+    margin: 10px auto;
+    /* Ensure centering works with max-width */
+}
+
+.project-desc {
+    max-width: 600px;
+    line-height: 1.5;
+}
+
+.project-divider {
+    width: 50px;
+    height: 2px;
+    background: #fff;
+    margin: 20px 0;
+}
+
+.tech-stack {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    padding: 10px 20px;
+    border-radius: 50px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.tech-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+/* About & Timeline */
+/* About & Timeline */
+#about {
+    align-items: center;
+}
+
+.about-header {
+    text-align: center;
+    margin-bottom: 40px;
+    max-width: 800px;
+    animation: fadeIn 1s ease-out;
+}
+
+.about-title {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+.about-description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.skills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    max-width: 800px;
+    margin-bottom: 80px;
+}
+
+.skill-pill {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    transition: transform 0.3s ease, background 0.3s;
+}
+
+.skill-pill:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-5px);
+}
+
+.timeline {
+    position: relative;
+    max-width: 1000px;
+    width: 100%;
+    padding: 20px 0;
+}
+
+.timeline-line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: repeating-linear-gradient(to bottom, #fff 0, #fff 5px, transparent 5px, transparent 10px);
+    transform: translateX(-50%);
+}
+
+.timeline-item {
+    position: relative;
+    width: 50%;
+    padding: 0 40px;
+    margin-bottom: 60px;
+    box-sizing: border-box;
+}
+
+.timeline-item:nth-child(odd) {
+    left: 0;
+    text-align: right;
+}
+
+.timeline-item:nth-child(even) {
+    left: 50%;
+    text-align: left;
+}
+
+/* Fix for alternating card content layout */
+.timeline-item:nth-child(even) .timeline-card {
+    flex-direction: row-reverse;
+}
+
+.timeline-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: height 0.5s var(--ease-custom);
+    display: flex;
+    flex-direction: row;
+    height: 150px;
+    /* Base height */
+}
+
+/* Moving internal styles here for better control */
+.t-image {
+    flex: 4;
+    /* 80% */
+    background-size: cover;
+    background-position: center;
+    transition: flex 0.5s var(--ease-custom);
+    height: 100%;
+    /* Ensure it fills container height */
+    min-height: 150px;
+}
+
+.t-content {
+    flex: 1;
+    /* 20% */
+    padding: 25px;
+    /* Increased padding */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    transition: flex 0.5s var(--ease-custom);
+}
+
+.timeline-card.expanded {
+    height: 350px;
+    /* Fixed expanded height or auto via JS, but CSS transition works best with fixed values or max-height */
+}
+
+.timeline-card.expanded .t-image {
+    flex: 1;
+}
+
+.timeline-card.expanded .t-content {
+    flex: 4;
+}
+
+/* Date Marker Styles */
+.t-date-marker {
+    position: absolute;
+    top: 20px;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: #fff;
+    width: 200px;
+    z-index: 10;
+}
+
+/* Odd Items (Left side card) -> Date on Right side of axis */
+.timeline-item:nth-child(odd) .t-date-marker {
+    right: -240px;
+    /* Moves it across the center line to the right */
+    text-align: left;
+}
+
+/* Even Items (Right side card) -> Date on Left side of axis */
+.timeline-item:nth-child(even) .t-date-marker {
+    left: -240px;
+    /* Moves it across the center line to the left */
+    text-align: right;
+}
+
+.t-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.t-desc {
+    font-size: 1rem;
+    line-height: 1.5;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease 0.2s, transform 0.4s ease 0.2s;
+    overflow-y: auto;
+    /* Allow scroll if text is too long */
+}
+
+.t-desc.hidden {
+    display: none;
+    /* Use opacity/transform for animation, display:none for layout removal when collapsed */
+}
+
+.timeline-card.expanded .t-desc {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Base Timeline (Desktop) */
+.timeline-item {
+    position: relative;
+    width: 50%;
+    padding: 0 40px;
+    margin-bottom: 60px;
+    box-sizing: border-box;
+}
+
+/* Mobile Responsiveness for Timeline */
+@media screen and (max-width: 768px) {
+    .timeline {
+        padding: 20px;
+        /* Center line becomes a left border line */
+        max-width: 100%;
+    }
+
+    .timeline-line {
+        left: 20px;
+        /* Move line to left */
+        transform: none;
+    }
+
+    .timeline-item {
+        width: 100%;
+        padding-left: 40px;
+        /* Space for line */
+        padding-right: 0;
+        margin-bottom: 40px;
+    }
+
+    /* Reset alternate positioning */
+    .timeline-item:nth-child(odd),
+    .timeline-item:nth-child(even) {
+        left: 0;
+        text-align: left;
+    }
+
+    /* Reset card direction */
+    .timeline-item:nth-child(even) .timeline-card {
+        flex-direction: row;
+    }
+
+    /* Move Date Marker above card */
+    .t-date-marker,
+    .timeline-item:nth-child(odd) .t-date-marker,
+    .timeline-item:nth-child(even) .t-date-marker {
+        position: relative;
+        top: auto;
+        left: auto;
+        right: auto;
+        width: 100%;
+        text-align: left;
+        margin-bottom: 10px;
+        color: var(--text-color);
+        font-size: 1rem;
+        opacity: 0.8;
+    }
+
+    /* Card Layout on mobile */
+    .timeline-card {
+        height: auto;
+        min-height: auto;
+        flex-direction: column !important;
+        /* Force column */
+    }
+
+    .t-image {
+        min-height: 200px;
+        width: 100%;
+        flex: none;
+        /* Disable flex sizing logic from desktop */
+    }
+
+    .t-content {
+        padding: 20px;
+        flex: none;
+    }
+
+    .timeline-card.expanded {
+        height: auto;
+        /* Let content dictate height */
+    }
+}
+
+
+/* Contact */
+#contact {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    padding: 0;
+    /* Full bleed */
+    overflow: hidden;
+}
+
+.contact-left {
+    flex: 73;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.contact-right {
+    flex: 27;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+    background: #000;
+}
+
+.word-art {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 400px;
+    /* Constraint for desktop */
+}
+
+.wa-row-1 {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.wa-con {
+    font-family: var(--font-body);
+    font-weight: 900;
+    line-height: 0.8;
+    /* Font size set by JS */
+}
+
+.wa-col-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.wa-tact,
+.wa-me {
+    font-family: var(--font-body);
+    font-weight: 900;
+    line-height: 0.8;
+}
+
+.arrow-container {
+    margin-top: 40px;
+    height: 150px;
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#arrow-canvas {
+    transition: opacity 0.5s ease, filter 0.5s ease;
+}
+
+#arrow-canvas.dissolve {
+    opacity: 0;
+    filter: blur(10px);
+}
+
+/* Footer */
+#footer {
+    width: 100%;
+    background: #000;
+    display: flex;
+    justify-content: center;
+}
+
+.footer-content {
+    width: 100%;
+    max-width: 1600px;
+    /* Slightly wider for modern screens */
+    padding: 80px 40px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.footer-column {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-width: 200px;
+}
+
+/* Footer Utility Classes */
+.bigtext {
+    font-family: var(--font-display);
+    font-size: 8rem;
+    font-weight: 700;
+    line-height: 0.8;
+    background: linear-gradient(to bottom, #fff, #666);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 20px;
+}
+
+.link {
+    cursor: pointer;
+    transition: opacity 0.3s;
+    text-decoration: none;
+    position: relative;
+    width: fit-content;
+}
+
+.link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: currentColor;
+    transition: width 0.3s;
+}
+
+.link:hover {
+    opacity: 1;
+}
+
+.link:hover::after {
+    width: 100%;
+}
+
+.gray {
+    color: #888;
+}
+
+.white {
+    color: #fff;
+}
+
+h4 {
+    font-weight: 400;
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* Popup */
+#popup-overlay {
+    position: fixed;
+    inset: 0;
+    height: 100vh;
+    /* Fallback */
+    height: 100dvh;
+    /* Mobile fix */
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+#popup-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+#popup-content {
+    background: rgba(30, 30, 30, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 400px;
+    transform: scale(0.9);
+    transition: transform 0.3s var(--ease-custom);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#popup-overlay.active #popup-content {
+    transform: scale(1);
+}
+
+.popup-item {
+    display: flex;
+    justify-content: flex-start;
+    /* Changed from space-between for icons */
+    align-items: center;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #fff;
+    gap: 15px;
+    /* Added gap */
+}
+
+.popup-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.popup-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.copy-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-left: 10px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.copy-icon-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* Utilities */
+.hidden {
+    display: none !important;
+}
+
+/* Responsive */
+@media (min-width: 1024px) {
+
+    /* Sticky cards on desktop */
+    .project-card {
+        position: sticky;
+        top: 20px;
+        height: 100vh;
+        max-height: 100vh;
+        margin-bottom: 0;
+        border-radius: 20px;
+        /* Default radius */
+        width: 100%;
+        max-width: 100%;
+        border: none;
+        transition: border-radius 0.3s;
+    }
+
+    .project-card.pinned {
+        border-radius: 0;
+    }
+
+    .timeline-item {
+        width: 50%;
+    }
+}
+
+@media (max-width: 768px) {
+    #hero {
+        flex-direction: column-reverse;
+        text-align: center;
+    }
+
+    .hero-image {
+        max-width: 250px;
+    }
+
+    .hero-greeting {
+        font-size: 2.5rem;
+    }
+
+    .timeline-line {
+        left: 20px;
+    }
+
+    .timeline-item {
+        width: 100%;
+        left: 0 !important;
+        text-align: left !important;
+        padding-left: 50px;
+        padding-right: 0;
+    }
+
+    /* Mobile Timeline Card - Vertical Stack */
+    .timeline-card {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .t-image {
+        width: 100%;
+        height: 200px;
+        flex: none;
+    }
+
+    .t-content {
+        width: 100%;
+        flex: auto;
+    }
+
+    .timeline-card.expanded .t-image {
+        /* Keep image visible or shrink? Prompt says "occupying 80%..." */
+        /* On mobile expanded, maybe we reduce image size? */
+        /* Let's keep image 200px and expand content below */
+        height: 200px;
+    }
+
+    #contact {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .contact-left {
+        height: 40vh;
+        flex: none;
+        width: 100%;
+    }
+
+    .contact-right {
+        flex: 1;
+        width: 100%;
+        padding: 40px 20px;
+    }
+
+    /* Allow Word Art to scale safely */
+    .word-art {
+        max-width: 100%;
+    }
+
+    /* Fixed Project Card Title Overflow */
+    .project-content {
+        padding: 0 10px;
+        /* Ensure padding */
+        width: 100%;
+    }
+
+    .project-title {
+        font-size: clamp(1.5rem, 5vw, 2.5rem);
+        /* Responsive fluid font */
+        overflow-wrap: break-word;
+        /* Ensure extremely long words break */
+        word-break: break-word;
+        hyphens: auto;
+        line-height: 1.2;
+        max-width: 100%;
+    }
+
+    .font-stretched {
+        transform: none;
+        /* Remove stretch on mobile */
+        width: 100%;
+        max-width: 100%;
+        margin: 10px 0;
+    }
+}

@@ -1,0 +1,398 @@
+{
+  "navbar": [
+    {
+      "sectionTitle": "Home",
+      "id": "hero"
+    },
+    {
+      "sectionTitle": "Project",
+      "id": "projects"
+    },
+    {
+      "sectionTitle": "About Me",
+      "id": "about"
+    },
+    {
+      "sectionTitle": "Contact Me",
+      "id": "contact"
+    }
+  ],
+  "hero": {
+    "greeting": "Hey there!",
+    "bio": "Hello, my name is Nam. I am a self-taught website programmer (kind of) from Vietnam since 2019. I am good at Node.js, JavaScript, AI prompting, deploying web apps, cPanel, and much more. I am currently leaning about Microsoft Azure, game making, and other creative multimedia art!",
+    "image": "https://portfolio.hgphnm.com/assets/IMG_0595.jpg"
+  },
+  "projects": [
+    {
+      "title": "Infinity Bot AutoMod Dashboard",
+      "fontStyle": "stretched",
+      "description": "A simplified Discord AutoModeration dashboard built with extra features while maintaining integrity.",
+      "image": "https://hgphnm.com/storage/background.png",
+      "link": "https://infinitybot.uk",
+      "techStack": [
+        "javascript",
+        "html",
+        "css",
+        "mongodb",
+        "nodejs",
+        "discord",
+        "google-analytics",
+        "google-seo"
+      ]
+    },
+    {
+      "title": "Tutor app",
+      "fontStyle": "stretched",
+      "description": "A similar portfolio page but for my tutoring (for free)",
+      "image": "https://portfolio.hgphnm.com/assets/tutor.png",
+      "link": "https://hgphnm.framer.website/",
+      "techStack": [
+        "framer",
+        "google-analytics"
+      ]
+    },
+    {
+      "title": "the Infinite void",
+      "fontStyle": "8-bit",
+      "description": "A funny app with a long domain I made for fun",
+      "image": "https://portfolio.hgphnm.com/assets/void.png",
+      "link": "https://iheardhavingalongdomainislikereallycoolsoyeah.work",
+      "techStack": [
+        "socket.io",
+        "html",
+        "css",
+        "javascript",
+        "json",
+        "nodejs"
+      ]
+    },
+    {
+      "title": "TagIt Digital NFC Bussiness Card",
+      "fontStyle": "stretched",
+      "description": "Digitallized Bussiness card using NFC technology. Tap with NFC-supported devices to share your identity immediately.",
+      "image": "https://portfolio.hgphnm.com/assets/nfc.png",
+      "link": "https://nfc.freshebred.page",
+      "techStack": [
+        "html",
+        "css",
+        "javascript",
+        "mongodb",
+        "nodejs"
+      ]
+    },
+    {
+      "title": "The portfolio",
+      "fontStyle": "stretched",
+      "description": "A portfolio. New and improved.",
+      "image": "https://portfolio.hgphnm.com/assets/portfolio.png",
+      "link": "https://portfolio.hgphnm.com",
+      "techStack": [
+        "html",
+        "css",
+        "javascript",
+        "json"
+      ]
+    }
+  ],
+  "about": {
+    "heading": "About Me",
+    "description": "Here are things I'm proud of knowing well enough (and a sneak peak of my journey)",
+    "skills": [
+      "mongoose connection",
+      "node.js",
+      "RESTful APIs",
+      "database structuring",
+      "AI prompting",
+      "AI coding",
+      "HTML + CSS + JavaScript",
+      "hardware",
+      "guitar"
+    ],
+    "timeline": [
+      {
+        "date": "November 2019",
+        "title": "A new adventure reveals",
+        "description": "I was curious of how the heck websites even work, is there a guy typing everything out in a google doc and then post it? how does content even get to my computer?? what even is code????",
+        "image": "https://portfolio.hgphnm.com/assets/journey1.jpg"
+      },
+      {
+        "date": "March 2020",
+        "title": "Aha, seems easy enough",
+        "description": "Well I had a rough programming start... I didn't have a computer back then and so I gotta self learn from w3schools, it was a total mess because I wasn't naturally smart at logics either!",
+        "image": "https://portfolio.hgphnm.com/assets/journey2.jpg"
+      },
+      {
+        "date": "October 2022",
+        "title": "My first coding prize!?",
+        "description": "I joined a small coding competition at my english school, it was nothing much really, just making a lucky wheel and rig it using math haha.",
+        "image": "https://portfolio.hgphnm.com/assets/journey3.jpg"
+      },
+      {
+        "date": "July 2024",
+        "title": "Branding my way",
+        "description": "I finally got my very first domain, this is literally when I start trying hard, I stayed up past midnight researching and coding my first portfolio (it was horrible).",
+        "image": "https://portfolio.hgphnm.com/assets/journey4.jpg"
+      },
+      {
+        "date": "August 2025",
+        "title": "I am a responsible son",
+        "description": "Through Discord, I finally had my first client, at 16!",
+        "image": "https://portfolio.hgphnm.com/assets/journey5.png"
+      },
+      {
+        "date": "dynamic",
+        "title": "Another chapter",
+        "description": "Guess what? It is now {{YEARS_SINCE_START}} years since I started coding! I'm proud, my mom's proud, you should be proud of me too (or else I'll be sad).",
+        "image": "https://portfolio.hgphnm.com/assets/journey6.png"
+      }
+    ]
+  },
+  "contact": {
+    "image": "https://portfolio.hgphnm.com/assets/contact.jpeg"
+  },
+  "footer": {
+    "mark": "Pnam",
+    "handle": "@Freshebred",
+    "columns": {
+      "0": [
+        [
+          {
+            "tag": "h1"
+          },
+          {
+            "style": "bigtext"
+          },
+          {
+            "content": "Pnam"
+          }
+        ],
+        [
+          {
+            "tag": "h4"
+          },
+          {
+            "style": [
+              "link",
+              "gray"
+            ]
+          },
+          {
+            "content": "@Freshebred"
+          },
+          {
+            "action": {
+              "type": "popup",
+              "content": "social"
+            }
+          }
+        ],
+        [
+          {
+            "tag": "h4"
+          },
+          {
+            "style": [
+              "link",
+              "gray"
+            ]
+          },
+          {
+            "content": "Email"
+          },
+          {
+            "action": {
+              "type": "popup",
+              "content": "email"
+            }
+          }
+        ]
+      ],
+      "1": [
+        [
+          {
+            "tag": "h4"
+          },
+          {
+            "style": [
+              "link",
+              "white"
+            ]
+          },
+          {
+            "content": "My main domain"
+          },
+          {
+            "action": {
+              "type": "url",
+              "content": "https://hgphnm.com"
+            }
+          }
+        ],
+        [
+          {
+            "tag": "h4"
+          },
+          {
+            "style": [
+              "link",
+              "white"
+            ]
+          },
+          {
+            "content": "My hobby domain"
+          },
+          {
+            "action": {
+              "type": "url",
+              "content": "https://freshebred.io.vn"
+            }
+          }
+        ],
+        [
+          {
+            "tag": "h4"
+          },
+          {
+            "style": [
+              "link",
+              "white"
+            ]
+          },
+          {
+            "content": "My portfolio"
+          },
+          {
+            "action": {
+              "type": "url",
+              "content": "https://portfolio.hgphnm.com"
+            }
+          }
+        ],
+        [
+          {
+            "tag": "h4"
+          },
+          {
+            "style": [
+              "link",
+              "white"
+            ]
+          },
+          {
+            "content": "My school projects"
+          },
+          {
+            "action": {
+              "type": "url",
+              "content": "https://project.hgphnm.com"
+            }
+          }
+        ],
+        [
+          {
+            "tag": "h4"
+          },
+          {
+            "style": [
+              "link",
+              "white"
+            ]
+          },
+          {
+            "content": "My social platform"
+          },
+          {
+            "action": {
+              "type": "url",
+              "content": "https://iheardhavingalongdomainislikereallycoolsoyeah.work"
+            }
+          }
+        ]
+      ],
+      "2": [
+        [
+          {
+            "tag": "h4"
+          },
+          {
+            "style": [
+              "white"
+            ]
+          },
+          {
+            "content": "© 2025 hgphnm.com"
+          }
+        ],
+        [
+          {
+            "tag": "h4"
+          },
+          {
+            "style": [
+              "white"
+            ]
+          },
+          {
+            "content": "All rights reserved"
+          }
+        ]
+      ]
+    },
+    "platforms": [
+      {
+        "name": "Facebook",
+        "url": "https://www.facebook.com/freshebred/",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/2023_Facebook_icon.svg/250px-2023_Facebook_icon.svg.png"
+      },
+      {
+        "name": "Instagram",
+        "url": "https://www.instagram.com/freshebred/",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Instagram_logo_2022.svg/330px-Instagram_logo_2022.svg.png"
+      },
+      {
+        "name": "GitHub",
+        "url": "https://github.com/freshebred",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/c/c2/GitHub_Invertocat_Logo.svg"
+      },
+      {
+        "name": "Apple Music",
+        "url": "https://music.apple.com/profile/freshebred",
+        "icon": "https://music.apple.com/assets/favicon/favicon-32.png"
+      },
+      {
+        "name": "Discord",
+        "url": "https://discord.com/users/986959868336410634",
+        "icon": "https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg"
+      }
+    ],
+    "emails": [
+      "levonitech@gmail.com",
+      "freshebred@icloud.com",
+      "pnam@hgphnm.com",
+      "hello@freshebred.io.vn",
+      "sothisisanemailtoalongdomain@iheardhavingalongdomainislikereallycoolsoyeah.work"
+    ]
+  },
+  "assets": {
+    "techIcons": {
+      "javascript": "https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png",
+      "css": "https://upload.wikimedia.org/wikipedia/commons/d/d5/CSS3_logo_and_wordmark.svg",
+      "html": "https://upload.wikimedia.org/wikipedia/commons/6/61/HTML5_logo_and_wordmark.svg",
+      "react": "https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg",
+      "python": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg",
+      "mongodb": "https://www.mongodb.com/assets/images/global/favicon.ico",
+      "sql": "https://upload.wikimedia.org/wikipedia/commons/8/87/Sql_data_base_with_logo.png",
+      "sqlite": "https://upload.wikimedia.org/wikipedia/commons/3/38/SQLite370.svg",
+      "postgres": "https://upload.wikimedia.org/wikipedia/commons/2/29/Postgresql_elephant.svg",
+      "nodejs": "https://nodejs.org/static/images/favicons/favicon.png",
+      "discord": "https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg",
+      "google-analytics": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/GAnalytics.svg/250px-GAnalytics.svg.png",
+      "google-seo": "https://upload.wikimedia.org/wikipedia/commons/3/3c/Google_Favicon_2025.svg",
+      "socket.io": "https://upload.wikimedia.org/wikipedia/commons/9/96/Socket-io.svg",
+      "json": "https://upload.wikimedia.org/wikipedia/commons/c/c9/JSON_vector_logo.svg",
+      "framer": "https://framerusercontent.com/images/s8byoJvwTkn7Gm2jKWNdTPv9F8Q.svg?width=140&height=140",
+      "groq":"https://console.groq.com/favicon.ico"
+    }
+    
+  }
+}
