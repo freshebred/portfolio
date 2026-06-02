@@ -52,6 +52,22 @@
       ]
     },
     {
+      "title": "Tmr homeCafe E-Commerce",
+      "fontStyle": "stretched",
+      "description": "A fully working and in-use E-Commerce with admin dashboard PWA, with integration with google sheets for data exportation",
+      "image": "https://portfolio.hgphnm.com/assets/tmr.png",
+      "link": "https://tmrcafe.com/",
+      "techStack": [
+        "javascript",
+        "html",
+        "css",
+        "mongodb",
+        "nodejs",
+        "google-seo",
+        "google-analytics"
+      ]
+    },
+    {
       "title": "the Infinite void",
       "fontStyle": "8-bit",
       "description": "A funny app with a long domain I made for fun",
