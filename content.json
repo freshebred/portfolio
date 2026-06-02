@@ -38,7 +38,10 @@
         "discord",
         "google-analytics",
         "google-seo"
-      ]
+      ],
+      "customer_feedback":"Very good service, always fast delivery and for a very good price, and the end product is amazing! Very takes initiative and always has ideas and solutions. I recommend Bred as your developer!",
+      "customer_name": "Castel - InfinityBot's creator",
+      "maintained": true
     },
     {
       "title": "Tutor app",
@@ -49,7 +52,8 @@
       "techStack": [
         "framer",
         "google-analytics"
-      ]
+      ],
+      "maintained": false
     },
     {
       "title": "Tmr homeCafe E-Commerce",
@@ -65,7 +69,8 @@
         "nodejs",
         "google-seo",
         "google-analytics"
-      ]
+      ],
+      "maintained": true
     },
     {
       "title": "the Infinite void",
@@ -80,7 +85,8 @@
         "javascript",
         "json",
         "nodejs"
-      ]
+      ],
+      "maintained": true
     },
     {
       "title": "TagIt Digital NFC Bussiness Card",
@@ -94,7 +100,8 @@
         "javascript",
         "mongodb",
         "nodejs"
-      ]
+      ],
+      "maintained": true
     },
     {
       "title": "The portfolio",
@@ -107,7 +114,8 @@
         "css",
         "javascript",
         "json"
-      ]
+      ],
+      "maintained": true
     }
   ],
   "about": {

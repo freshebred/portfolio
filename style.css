@@ -346,6 +346,54 @@ html.lenis body {
     text-transform: uppercase;
 }
 
+.project-header-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.project-maintained {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.project-maintained.active {
+    color: #4ade80;
+    border-color: rgba(74, 222, 128, 0.3);
+}
+
+.project-maintained.inactive {
+    color: #f87171;
+    border-color: rgba(248, 113, 113, 0.3);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.active .status-dot {
+    background-color: #4ade80;
+    box-shadow: 0 0 8px #4ade80;
+}
+
+.inactive .status-dot {
+    background-color: #f87171;
+    box-shadow: 0 0 8px #f87171;
+}
+
 .project-title {
     font-size: 3rem;
     margin: 10px 0;
@@ -369,6 +417,30 @@ html.lenis body {
 .project-desc {
     max-width: 600px;
     line-height: 1.5;
+}
+
+.customer-feedback {
+    margin: 15px 0 5px;
+    padding: 15px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid rgba(255, 255, 255, 0.5);
+    border-radius: 0 8px 8px 0;
+    max-width: 600px;
+    backdrop-filter: blur(5px);
+}
+
+.feedback-quote {
+    font-style: italic;
+    color: #f0f0f0;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+.feedback-name {
+    font-size: 0.9rem;
+    color: #b0b0b0;
+    font-weight: 500;
 }
 
 .project-divider {

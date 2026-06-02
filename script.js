@@ -96,12 +96,29 @@ function renderProjects() {
         card.className = 'project-card';
         const titleClass = project.fontStyle === '8-bit' ? 'font-8bit' : 'font-stretched';
 
+        const feedbackHtml = project.customer_feedback && project.customer_name ? `
+            <div class="customer-feedback">
+                <p class="feedback-quote">"${project.customer_feedback}"</p>
+                <p class="feedback-name">- ${project.customer_name}</p>
+            </div>
+        ` : '';
+
+        const maintainedHtml = project.maintained !== undefined 
+            ? `<div class="project-maintained ${project.maintained ? 'active' : 'inactive'}">
+                 <span class="status-dot"></span> ${project.maintained ? 'Actively Maintained' : 'No Longer Maintained'}
+               </div>`
+            : '';
+
         card.innerHTML = `
             <div class="project-bg" style="background-image: url('${project.image}')"></div>
             <div class="project-content">
-                <div class="project-pretext">Featured Project</div>
+                <div class="project-header-top">
+                    <div class="project-pretext">Featured Project</div>
+                    ${maintainedHtml}
+                </div>
                 <h2 class="project-title ${titleClass}">${project.title}</h2>
                 <p class="project-desc">${project.description}</p>
+                ${feedbackHtml}
                 <div class="project-divider"></div>
                 <div class="tech-stack">${stackHtml}</div>
             </div>
