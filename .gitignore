@@ -1,4 +1,5 @@
 .well-known
 cgi-bin
 google*.html
-
+.cms_auth.php
+content.backup.json

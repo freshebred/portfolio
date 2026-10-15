@@ -14,11 +14,17 @@ requestAnimationFrame(raf);
 // Global State
 let contentData = null;
 let activeSection = 0;
+let isNavbarHovered = false;
+let isProgrammaticScroll = false;
+let programmaticScrollTimer = null;
+let leaveHoverTimer = null;
+let swipeTimer = null;
+let swipeCleanupTimer = null;
 
 // Fetch Content
 async function loadContent() {
     try {
-        const response = await fetch('content.json');
+        const response = await fetch(`content.json?v=${Date.now()}`, { cache: 'no-store' });
         contentData = await response.json();
         renderApp();
     } catch (error) {
@@ -37,12 +43,32 @@ function renderApp() {
     initInteractions();
     initArrowAnimation();
     initSectionObserver();
+
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+            updateNavBlob(activeSection);
+            syncNavbarSize();
+            resizeWordArt();
+        });
+    }
+    window.addEventListener('resize', () => {
+        updateNavBlob(activeSection);
+        syncNavbarSize();
+    });
 }
 
 // --- Render Functions ---
 
 function renderNavbar() {
     const navList = document.getElementById('nav-list');
+    const miniText = document.getElementById('nav-mini-text');
+
+    if (miniText) {
+        miniText.classList.remove('hidden');
+        if (contentData.navbar[0]) {
+            miniText.textContent = contentData.navbar[0].sectionTitle;
+        }
+    }
 
     contentData.navbar.forEach((item, index) => {
         const li = document.createElement('li');
@@ -50,13 +76,18 @@ function renderNavbar() {
         li.textContent = item.sectionTitle;
         li.dataset.index = index;
         li.dataset.target = item.id;
-        li.addEventListener('click', () => scrollToSection(item.id, index));
+        li.addEventListener('click', (e) => {
+            e.stopPropagation();
+            scrollToSection(item.id, index);
+        });
         navList.appendChild(li);
     });
 
     // Initial active state
-    // setTimeout to ensure layout is ready
-    setTimeout(() => updateNavBlob(0), 100);
+    requestAnimationFrame(() => {
+        updateNavBlob(0);
+        syncNavbarSize();
+    });
 }
 
 function renderHero() {
@@ -80,17 +111,26 @@ function renderProjects() {
     const section = document.getElementById('projects');
     const data = contentData.projects;
     const assets = contentData.assets.techIcons;
+    const totalCount = String(data.length).padStart(2, '0');
 
     // Add a wrapper for animation
     const wrapper = document.createElement('div');
-    wrapper.className = 'section-content';
+    wrapper.className = 'section-content projects-wrapper';
     wrapper.style.width = '100%';
 
-    data.forEach((project) => {
+    data.forEach((project, idx) => {
+        const indexNum = String(idx + 1).padStart(2, '0');
         const stackHtml = project.techStack.map(key => {
             const iconUrl = assets[key];
             return iconUrl ? `<img src="${iconUrl}" alt="${key}" class="tech-icon" title="${key}">` : '';
         }).join('');
+
+        let hostname = project.link;
+        try {
+            hostname = new URL(project.link).hostname.replace(/^www\./, '');
+        } catch (e) {
+            // fallback to raw link
+        }
 
         const card = document.createElement('div');
         card.className = 'project-card';
@@ -99,7 +139,7 @@ function renderProjects() {
         const feedbackHtml = project.customer_feedback && project.customer_name ? `
             <div class="customer-feedback">
                 <p class="feedback-quote">"${project.customer_feedback}"</p>
-                <p class="feedback-name">- ${project.customer_name}</p>
+                <p class="feedback-name">— ${project.customer_name}</p>
             </div>
         ` : '';
 
@@ -111,16 +151,46 @@ function renderProjects() {
 
         card.innerHTML = `
             <div class="project-bg" style="background-image: url('${project.image}')"></div>
+            <div class="project-watermark" aria-hidden="true">${indexNum}</div>
             <div class="project-content">
                 <div class="project-header-top">
-                    <div class="project-pretext">Featured Project</div>
+                    <div class="project-meta-left">
+                        <span class="project-index">${indexNum} <span class="project-index-slash">/</span> ${totalCount}</span>
+                        <div class="project-pretext">Featured Project</div>
+                    </div>
                     ${maintainedHtml}
                 </div>
-                <h2 class="project-title ${titleClass}">${project.title}</h2>
-                <p class="project-desc">${project.description}</p>
-                ${feedbackHtml}
-                <div class="project-divider"></div>
-                <div class="tech-stack">${stackHtml}</div>
+
+                <div class="project-main-grid">
+                    <div class="project-info-col">
+                        <h2 class="project-title ${titleClass}">${project.title}</h2>
+                        <div class="project-divider"></div>
+                        <p class="project-desc">${project.description}</p>
+                        ${feedbackHtml}
+                    </div>
+
+                    <div class="project-visual-col">
+                        <div class="project-showcase-frame">
+                            <div class="showcase-browser-bar">
+                                <div class="showcase-dots">
+                                    <span></span><span></span><span></span>
+                                </div>
+                                <div class="showcase-domain">${hostname}</div>
+                            </div>
+                            <div class="showcase-img-wrap">
+                                <img src="${project.image}" alt="${project.title}" class="showcase-img" loading="lazy">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-footer-bar">
+                    <div class="tech-stack">${stackHtml}</div>
+                    <div class="project-cta">
+                        <span>Explore Project</span>
+                        <span class="project-cta-arrow">↗</span>
+                    </div>
+                </div>
             </div>
         `;
 
@@ -306,7 +376,7 @@ function renderFooter() {
 
 // --- Interactions ---
 
-// Background Blob Mouse Interaction
+// Background Blob Mouse Interaction (uses CSS `translate` so it composes with `@keyframes drift` `transform`)
 window.addEventListener('mousemove', (e) => {
     const blobs = document.querySelectorAll('.blob');
     const x = e.clientX / window.innerWidth;
@@ -316,35 +386,80 @@ window.addEventListener('mousemove', (e) => {
         const factor = (i + 1) * 20;
         const offsetX = (x - 0.5) * factor;
         const offsetY = (y - 0.5) * factor;
-        blob.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+        blob.style.translate = `${offsetX}px ${offsetY}px`;
     });
 });
+
+function syncNavbarSize() {
+    const navbar = document.getElementById('navbar');
+    const navList = document.getElementById('nav-list');
+    const miniText = document.getElementById('nav-mini-text');
+    if (!navbar || !navList || !miniText) return;
+
+    const isCollapsedMini = navbar.classList.contains('mini') && !navbar.classList.contains('expanded-hover');
+
+    if (isCollapsedMini) {
+        // Mini pill padding: 5px top/bottom (10px) + 15px left/right (30px) + 2px border
+        const targetW = Math.ceil(miniText.offsetWidth) + 32;
+        const targetH = Math.ceil(miniText.offsetHeight) + 12;
+        navbar.style.width = `${targetW}px`;
+        navbar.style.height = `${targetH}px`;
+    } else {
+        // Expanded pill padding: 10px top/bottom (20px) + 10px left/right (20px) + 2px border
+        const targetW = Math.ceil(navList.offsetWidth) + 22;
+        const targetH = Math.ceil(navList.offsetHeight) + 22;
+        navbar.style.width = `${targetW}px`;
+        navbar.style.height = `${targetH}px`;
+    }
+}
+
+function clearMiniTextInlineStyles() {
+    const el = document.getElementById('nav-mini-text');
+    if (!el) return;
+    clearTimeout(swipeTimer);
+    clearTimeout(swipeCleanupTimer);
+    el.style.transition = '';
+    el.style.transform = '';
+    el.style.opacity = '';
+    el.style.filter = '';
+}
 
 function scrollToSection(id, index) {
     const el = document.getElementById(id);
     if (el) {
-        lenis.scrollTo(el);
+        isProgrammaticScroll = true;
+        clearTimeout(programmaticScrollTimer);
+        programmaticScrollTimer = setTimeout(() => {
+            isProgrammaticScroll = false;
+        }, 1250);
+
         updateNavBlob(index);
         animateNavbarClick();
 
-        // Force contract navbar if on mobile/locked mode
+        const miniText = document.getElementById('nav-mini-text');
+        if (miniText && contentData.navbar[index]) {
+            clearMiniTextInlineStyles();
+            miniText.textContent = contentData.navbar[index].sectionTitle;
+        }
+
+        lenis.scrollTo(el, {
+            onComplete: () => {
+                isProgrammaticScroll = false;
+                clearTimeout(programmaticScrollTimer);
+            }
+        });
+
+        // Contract navbar on touch/coarse pointer devices after selecting a section
         const navbar = document.getElementById('navbar');
-        // We can reuse the logic: remove classes directly or call contractNavbar if it was accessible (scope issue).
-        // Since contractNavbar is scoped inside initInteractions, we'll just manually clean up classes here or expose it.
-        // Easiest is to manually clean up since we know the desired state:
-        if (navbar.classList.contains('mini')) {
-            navbar.classList.remove('expanded-lock');
-            // The scroll event listener will likely handle the rest ('mini' logic), 
-            // but to be snappy, we shouldn't force close visually until scroll happens?
-            // Actually, usually you want it to close immediately.
-            // We can trigger a click on body or just remove the lock.
+        if (navbar.classList.contains('mini') && !window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+            navbar.classList.remove('expanded-hover');
+            syncNavbarSize();
         }
     }
 }
 
 function animateNavbarClick() {
     const nav = document.getElementById('navbar');
-    // CSS handles the animation via class
     nav.classList.add('scaled');
 
     setTimeout(() => {
@@ -365,7 +480,7 @@ function updateNavBlob(index) {
     navItems.forEach(item => item.classList.remove('active'));
     target.classList.add('active');
 
-    // Position using offset (blob is now inside nav-list, sibling to nav-items)
+    // Position using offset (blob is inside nav-list, sibling to nav-items)
     const left = target.offsetLeft;
     const top = target.offsetTop;
     const width = target.offsetWidth;
@@ -381,53 +496,69 @@ function updateNavBlob(index) {
 
 // Navbar Scroll Logic
 function initInteractions() {
-    lenis.on('scroll', ({ scroll }) => {
-        const navbar = document.getElementById('navbar');
-        const navList = document.getElementById('nav-list');
-        const miniText = document.getElementById('nav-mini-text');
-        const navBlob = document.getElementById('nav-blob');
+    const navbar = document.getElementById('navbar');
+    const miniText = document.getElementById('nav-mini-text');
 
+    const expandNavbar = () => {
+        clearTimeout(leaveHoverTimer);
+        if (navbar.classList.contains('mini') && !navbar.classList.contains('expanded-hover')) {
+            clearMiniTextInlineStyles();
+            navbar.classList.add('expanded-hover');
+            updateNavBlob(activeSection);
+            syncNavbarSize();
+        }
+    };
+
+    const contractNavbar = () => {
+        clearTimeout(leaveHoverTimer);
+        if (navbar.classList.contains('mini') && navbar.classList.contains('expanded-hover')) {
+            clearMiniTextInlineStyles();
+            miniText.textContent = contentData.navbar[activeSection].sectionTitle;
+            navbar.classList.remove('expanded-hover');
+            syncNavbarSize();
+        }
+    };
+
+    lenis.on('scroll', ({ scroll }) => {
         if (scroll > 100) {
-            // Only switch to mini if we are NOT hovering (handled by class check)
-            if (!navbar.classList.contains('mini') && !navbar.classList.contains('expanded-hover')) {
-                navbar.classList.add('mini');
-                navList.classList.add('hidden');
-                navBlob.classList.add('hidden');
-                miniText.classList.remove('hidden');
-                // Force a reflow before showing to ensure transition works if needed
-                void miniText.offsetWidth;
+            if (!navbar.classList.contains('mini')) {
+                clearMiniTextInlineStyles();
                 miniText.textContent = contentData.navbar[activeSection].sectionTitle;
+                navbar.classList.add('mini');
+                // If cursor is already inside navbar when crossing 100px, stay expanded until mouseleave
+                if (isNavbarHovered) {
+                    navbar.classList.add('expanded-hover');
+                }
+                syncNavbarSize();
             }
         } else {
             if (navbar.classList.contains('mini')) {
-                navbar.classList.remove('mini');
-                navbar.classList.remove('expanded-hover'); // Safety clean
-                navList.classList.remove('hidden');
-                navBlob.classList.remove('hidden');
-                miniText.classList.add('hidden');
-                // Recalculate blob position as navbar expands
-                // Small delay to let navbar expand
-                setTimeout(() => updateNavBlob(activeSection), 50);
+                clearMiniTextInlineStyles();
+                navbar.classList.remove('mini', 'expanded-hover');
+                updateNavBlob(activeSection);
+                syncNavbarSize();
             }
         }
 
-        // Active section detection
-        const sections = document.querySelectorAll('.section');
-        sections.forEach((sec, i) => {
-            const rect = sec.getBoundingClientRect();
-            // Center of viewport
+        // Active section detection (skip intermediate overrides while click-scrolling)
+        if (!isProgrammaticScroll) {
+            const sections = document.querySelectorAll('.section');
             const center = window.innerHeight / 2;
-            if (rect.top <= center && rect.bottom >= center) {
-                if (activeSection !== i) {
-                    if (navbar.classList.contains('mini') && !navbar.classList.contains('expanded-hover')) {
-                        swipeMiniText(contentData.navbar[i].sectionTitle);
+            sections.forEach((sec, i) => {
+                const rect = sec.getBoundingClientRect();
+                if (rect.top <= center && rect.bottom >= center) {
+                    if (activeSection !== i) {
+                        activeSection = i;
+                        updateNavBlob(i);
+                        if (navbar.classList.contains('mini') && !navbar.classList.contains('expanded-hover')) {
+                            swipeMiniText(contentData.navbar[i].sectionTitle);
+                        } else {
+                            miniText.textContent = contentData.navbar[i].sectionTitle;
+                        }
                     }
-                    activeSection = i;
-                    // Always update blob if we can see it
-                    updateNavBlob(i);
                 }
-            }
-        });
+            });
+        }
 
         // Pinned projects
         const projectCards = document.querySelectorAll('.project-card');
@@ -441,44 +572,26 @@ function initInteractions() {
         });
     });
 
-    // Hover to expand Mini Navbar
-    const navbar = document.getElementById('navbar');
-    const navList = document.getElementById('nav-list');
-    const miniText = document.getElementById('nav-mini-text');
-    const navBlob = document.getElementById('nav-blob');
+    // Mouse interactions (Desktop) with small leave debounce to prevent cubic-bezier edge dip flicker
+    navbar.addEventListener('mouseenter', () => {
+        isNavbarHovered = true;
+        clearTimeout(leaveHoverTimer);
+        expandNavbar();
+    });
 
-    // Helper to expand
-    const expandNavbar = () => {
-        if (navbar.classList.contains('mini')) {
-            navbar.classList.add('expanded-hover');
-            navList.classList.remove('hidden');
-            navBlob.classList.remove('hidden');
-            miniText.classList.add('hidden');
-            setTimeout(() => updateNavBlob(activeSection), 50);
-        }
-    };
-
-    // Helper to contract
-    const contractNavbar = () => {
-        if (navbar.classList.contains('mini') && navbar.classList.contains('expanded-hover')) {
-            navbar.classList.remove('expanded-hover');
-            navList.classList.add('hidden');
-            navBlob.classList.add('hidden');
-            miniText.classList.remove('hidden');
-            miniText.textContent = contentData.navbar[activeSection].sectionTitle;
-        }
-    };
-
-    // Mouse interactions (Desktop)
-    navbar.addEventListener('mouseenter', expandNavbar);
-    navbar.addEventListener('mouseleave', contractNavbar);
+    navbar.addEventListener('mouseleave', () => {
+        isNavbarHovered = false;
+        clearTimeout(leaveHoverTimer);
+        leaveHoverTimer = setTimeout(() => {
+            if (!isNavbarHovered) {
+                contractNavbar();
+            }
+        }, 80);
+    });
 
     // Click interaction (Mobile/Tablet)
     navbar.addEventListener('click', (e) => {
-        // Stop propagation so document click doesn't immediately close it
         e.stopPropagation();
-
-        // If it's mini and not expanded, expand it
         if (navbar.classList.contains('mini') && !navbar.classList.contains('expanded-hover')) {
             expandNavbar();
         }
@@ -487,6 +600,7 @@ function initInteractions() {
     // Close when clicking outside
     document.addEventListener('click', (e) => {
         if (!navbar.contains(e.target)) {
+            isNavbarHovered = false;
             contractNavbar();
         }
     });
@@ -495,40 +609,52 @@ function initInteractions() {
 function initSectionObserver() {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
+            if (entry.isIntersecting && !entry.target.classList.contains('active-view')) {
                 entry.target.classList.add('active-view');
+                setTimeout(() => {
+                    entry.target.classList.add('transition-done');
+                }, 850);
             }
-            // Optional: If you interpret "replace it with a new one elegantly" as tied strictly to section active state
         });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.02 });
 
     document.querySelectorAll('.section').forEach(sec => observer.observe(sec));
 }
 
 function swipeMiniText(newText) {
     const el = document.getElementById('nav-mini-text');
+    if (!el) return;
+
+    clearTimeout(swipeTimer);
+    clearTimeout(swipeCleanupTimer);
 
     // 1. Exit Active
+    el.style.transition = 'transform 0.2s ease, opacity 0.2s ease, filter 0.2s ease';
     el.style.transform = 'translateX(-20px)';
     el.style.opacity = '0';
     el.style.filter = 'blur(5px)';
 
-    // 2. Wait for transition (300ms)
-    setTimeout(() => {
-        // 3. Reset position instantly for entry
+    // 2. Wait for exit transition (200ms)
+    swipeTimer = setTimeout(() => {
+        // 3. Reset position instantly for entry & update pill width
         el.style.transition = 'none';
         el.style.transform = 'translateX(20px)';
         el.textContent = newText;
+        syncNavbarSize();
 
         // Force Reflow
         void el.offsetWidth;
 
         // 4. Enter New
-        el.style.transition = 'transform 0.3s cubic-bezier(.44,-0.08,0,1.38), opacity 0.3s ease, filter 0.3s ease';
+        el.style.transition = 'transform 0.3s cubic-bezier(.44,-0.08,0,1.38), opacity 0.25s ease, filter 0.25s ease';
         el.style.transform = 'translateX(0)';
         el.style.opacity = '1';
         el.style.filter = 'blur(0)';
-    }, 300);
+
+        swipeCleanupTimer = setTimeout(() => {
+            clearMiniTextInlineStyles();
+        }, 320);
+    }, 200);
 }
 
 // Popups
@@ -664,117 +790,179 @@ function toggleTimeline(card) {
     }
 }
 
-// Arrow Animation
+// Arrow Animation (Curved arrow from cursor to @Freshebred when in Contact section)
 function initArrowAnimation() {
     const canvas = document.getElementById('arrow-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    canvas.width = 300;
-    canvas.height = 150; // Match container
-
-    let isIdle = false;
-    let idleTimer;
-    let arrowVisible = false;
-    let rafId;
-
-    const resetTimer = () => {
-        clearTimeout(idleTimer);
-        isIdle = false;
-
-        if (arrowVisible) {
-            hideArrow();
-        }
-
-        idleTimer = setTimeout(() => {
-            isIdle = true;
-            showArrow();
-        }, 700);
+    const resizeCanvas = () => {
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = window.innerWidth * dpr;
+        canvas.height = window.innerHeight * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-    window.addEventListener('scroll', resetTimer);
-    window.addEventListener('mousemove', resetTimer);
-    resetTimer();
+    let hasPointerMoved = false;
+    let isTouchActive = false;
+    let touchReleaseTimer = null;
+    let mouseX = window.innerWidth * 0.75;
+    let mouseY = window.innerHeight * 0.5;
+    let currX = mouseX;
+    let currY = mouseY;
 
-    function showArrow() {
-        if (!isIdle) return;
-        arrowVisible = true;
-        canvas.classList.remove('dissolve');
-        canvas.style.opacity = '1';
-        canvas.style.filter = 'blur(0px)';
+    window.addEventListener('mousemove', (e) => {
+        // Ignore synthetic mousemove events fired after touch taps on mobile
+        if (window.matchMedia && !window.matchMedia('(pointer: fine)').matches) return;
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        if (!hasPointerMoved) {
+            hasPointerMoved = true;
+            currX = mouseX;
+            currY = mouseY;
+        }
+    });
 
-        drawArrowLoop();
-
-        // Hold for 1 second then retract
-        setTimeout(() => {
-            if (isIdle) hideArrow();
-        }, 1500);
-    }
-
-    function hideArrow() {
-        arrowVisible = false;
-        canvas.classList.add('dissolve');
-    }
+    window.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches.length > 0) {
+            isTouchActive = true;
+            mouseX = e.touches[0].clientX;
+            mouseY = e.touches[0].clientY;
+            clearTimeout(touchReleaseTimer);
+            touchReleaseTimer = setTimeout(() => {
+                isTouchActive = false;
+            }, 1200);
+        }
+    }, { passive: true });
 
     function drawArrowLoop() {
-        if (!arrowVisible && canvas.classList.contains('dissolve')) {
-            // Keep drawing while fading out if needed, but for now just stop if hidden?
-            // Better to keep loop running if we want smooth movement during fade?
-            // Simplification: just draw one frame or loop?
-            // Let's loop.
-        }
-
-        // If completely hidden (opacity 0) we could stop, but handling that state is complex.
-
-        const rect = canvas.getBoundingClientRect();
+        const contactSection = document.getElementById('contact');
         const target = document.getElementById('footer-handle');
-        if (!target) return;
-        const targetRect = target.getBoundingClientRect();
+        const popupOverlay = document.getElementById('popup-overlay');
 
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-
-        // Calculate angle to target
-        // Canvas center in viewport
-        const canvasViewportX = rect.left + rect.width / 2;
-        const canvasViewportY = rect.top + rect.height / 2;
-
-        // Target center in viewport
-        const targetViewportX = targetRect.left + targetRect.width / 2;
-        const targetViewportY = targetRect.top + targetRect.height / 2;
-
-        const dx = targetViewportX - canvasViewportX;
-        const dy = targetViewportY - canvasViewportY;
-        const angle = Math.atan2(dy, dx);
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        ctx.save();
-        ctx.translate(centerX, centerY);
-        ctx.rotate(angle);
-
-        // Draw Compass Arrow
-        ctx.beginPath();
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 3;
-
-        // Arrow shaft
-        ctx.moveTo(-30, 0);
-        ctx.lineTo(30, 0);
-
-        // Arrow head
-        ctx.moveTo(30, 0);
-        ctx.lineTo(20, -10);
-        ctx.moveTo(30, 0);
-        ctx.lineTo(20, 10);
-
-        ctx.stroke();
-        ctx.restore();
-
-        if (isIdle || !canvas.classList.contains('dissolve')) {
-            rafId = requestAnimationFrame(drawArrowLoop);
+        if (!contactSection || !target) {
+            requestAnimationFrame(drawArrowLoop);
+            return;
         }
+
+        const contactRect = contactSection.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        const isPopupOpen = popupOverlay && popupOverlay.classList.contains('active');
+
+        // Active when user has scrolled down to Contact Me (or Footer)
+        const isInContactSection = contactRect.top <= window.innerHeight * 0.65 && !isPopupOpen;
+
+        // On mobile (or before desktop mouse moves), anchor smoothly to .arrow-container unless finger is dragging
+        if (!hasPointerMoved && !isTouchActive) {
+            const container = document.querySelector('.arrow-container');
+            if (container) {
+                const cRect = container.getBoundingClientRect();
+                mouseX = cRect.left + cRect.width / 2;
+                mouseY = cRect.top + cRect.height / 2;
+            }
+        }
+        currX += (mouseX - currX) * 0.22;
+        currY += (mouseY - currY) * 0.22;
+
+        // Target center (@Freshebred link in footer)
+        const rawTargetX = targetRect.left + targetRect.width / 2;
+        const rawTargetY = targetRect.top + targetRect.height / 2;
+
+        const rawDist = Math.hypot(rawTargetX - currX, rawTargetY - currY);
+
+        if (isInContactSection && rawDist > 40) {
+            canvas.classList.add('active');
+            canvas.classList.remove('dissolve');
+        } else {
+            canvas.classList.remove('active');
+            canvas.classList.add('dissolve');
+        }
+
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+        if (rawDist > 25) {
+            // Determine visible endpoint (clamp to bottom of viewport if footer isn't scrolled into view yet)
+            let ex = rawTargetX;
+            let ey = rawTargetY;
+            const bottomMargin = 22;
+
+            if (rawTargetY > window.innerHeight - bottomMargin && currY < window.innerHeight - bottomMargin) {
+                const t = (window.innerHeight - bottomMargin - currY) / (rawTargetY - currY);
+                ex = currX + (rawTargetX - currX) * Math.max(0.1, Math.min(1, t));
+                ey = window.innerHeight - bottomMargin;
+            } else {
+                // Stop just outside the @Freshebred element box so the arrowhead doesn't cover the text
+                const angleToTarget = Math.atan2(rawTargetY - currY, rawTargetX - currX);
+                const padX = (targetRect.width / 2) + 12;
+                const padY = (targetRect.height / 2) + 10;
+                const stopDist = Math.min(
+                    rawDist * 0.35,
+                    Math.hypot(Math.cos(angleToTarget) * padX, Math.sin(angleToTarget) * padY)
+                );
+                ex = rawTargetX - Math.cos(angleToTarget) * stopDist;
+                ey = rawTargetY - Math.sin(angleToTarget) * stopDist;
+            }
+
+            const fullDx = ex - currX;
+            const fullDy = ey - currY;
+            const fullDist = Math.hypot(fullDx, fullDy);
+
+            if (fullDist > 20) {
+                // Quadratic Bezier control point with smooth perpendicular curve
+                const mx = (currX + ex) / 2;
+                const my = (currY + ey) / 2;
+                const nx = -fullDy / fullDist;
+                const ny = fullDx / fullDist;
+                const curveOffset = Math.min(fullDist * 0.22, 130);
+
+                const cx = mx + nx * curveOffset;
+                const cy = my + ny * curveOffset;
+
+                // Offset start slightly away from the cursor tip along initial tangent
+                const startAngle = Math.atan2(cy - currY, cx - currX);
+                const startOffset = Math.min(18, fullDist * 0.2);
+                const sx = currX + Math.cos(startAngle) * startOffset;
+                const sy = currY + Math.sin(startAngle) * startOffset;
+
+                // Tangent angle at the end of quadratic Bezier (from control point to end point)
+                const endAngle = Math.atan2(ey - cy, ex - cx);
+                const headLength = 14;
+                const headSpread = Math.PI / 6.5;
+
+                ctx.save();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                // Curved shaft
+                ctx.beginPath();
+                ctx.moveTo(sx, sy);
+                ctx.quadraticCurveTo(cx, cy, ex, ey);
+                ctx.stroke();
+
+                // Arrowhead aligned with curve arrival tangent
+                ctx.beginPath();
+                ctx.moveTo(
+                    ex - headLength * Math.cos(endAngle - headSpread),
+                    ey - headLength * Math.sin(endAngle - headSpread)
+                );
+                ctx.lineTo(ex, ey);
+                ctx.lineTo(
+                    ex - headLength * Math.cos(endAngle + headSpread),
+                    ey - headLength * Math.sin(endAngle + headSpread)
+                );
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        requestAnimationFrame(drawArrowLoop);
     }
+
+    requestAnimationFrame(drawArrowLoop);
 }
 
 // Start
