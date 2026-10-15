@@ -155,7 +155,6 @@ function renderProjects() {
             <div class="project-content">
                 <div class="project-header-top">
                     <div class="project-meta-left">
-                        <span class="project-index">${indexNum} <span class="project-index-slash">/</span> ${totalCount}</span>
                         <div class="project-pretext">Featured Project</div>
                     </div>
                     ${maintainedHtml}

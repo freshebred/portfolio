@@ -308,37 +308,12 @@ $pinLength = (int)($authConfig['pin_length'] ?? 4);
             width: 100%;
             max-width: 1200px;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
             font-size: 0.78rem;
             letter-spacing: 0.12em;
             text-transform: uppercase;
             color: var(--text-secondary);
-        }
-
-        .lock-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
-            border-radius: 999px;
-            background: var(--surface-2);
-            border: 1px solid var(--border-subtle);
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .lock-badge-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #fff;
-            animation: pulseDot 2s infinite ease-in-out;
-        }
-
-        @keyframes pulseDot {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(0.6); opacity: 0.4; }
         }
 
         .lock-back-link {
@@ -356,7 +331,7 @@ $pinLength = (int)($authConfig['pin_length'] ?? 4);
             background: var(--surface-1);
         }
 
-        /* Lock Main Container (Responsive Split on Wide Screens, Stack on Mobile) */
+        /* Lock Main Container */
         .lock-body {
             width: 100%;
             max-width: 420px;
@@ -364,47 +339,8 @@ $pinLength = (int)($authConfig['pin_length'] ?? 4);
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: clamp(18px, 3.2vh, 34px);
+            gap: clamp(22px, 3.6vh, 36px);
             margin: auto 0;
-        }
-
-        .lock-header {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .lock-clock {
-            font-family: var(--font-sans);
-            font-weight: 300;
-            font-size: clamp(2.6rem, 6vh, 4.2rem);
-            line-height: 0.95;
-            letter-spacing: -0.04em;
-            color: #fff;
-        }
-
-        .lock-title {
-            font-family: var(--font-display);
-            font-size: clamp(1.1rem, 2.2vh, 1.45rem);
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: #fff;
-        }
-
-        .lock-subtitle {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            min-height: 1.3em;
-            transition: color 0.2s ease;
-        }
-
-        .lock-subtitle.error {
-            color: #fff;
-            background: #2c2c2c;
-            padding: 2px 12px;
-            border-radius: 999px;
         }
 
         /* Android M3 Expressive Morphing Shape PIN Indicators */
@@ -623,14 +559,6 @@ $pinLength = (int)($authConfig['pin_length'] ?? 4);
                 transform: scale(3.2);
                 opacity: 0;
             }
-        }
-
-        .lock-footer {
-            font-family: var(--font-mono);
-            font-size: 1rem;
-            letter-spacing: 0.08em;
-            color: var(--text-muted);
-            text-transform: uppercase;
         }
 
         /* =====================================================
@@ -1171,9 +1099,6 @@ $pinLength = (int)($authConfig['pin_length'] ?? 4);
         }
 
         @media (max-height: 680px) {
-            .lock-clock {
-                font-size: 2.2rem;
-            }
             .m3-key {
                 height: 54px;
             }
@@ -1192,20 +1117,10 @@ $pinLength = (int)($authConfig['pin_length'] ?? 4);
          ========================================================== -->
     <section id="lock-screen" class="<?php echo $isAuthed ? 'unlocked' : ''; ?>">
         <div class="lock-topbar">
-            <div class="lock-badge">
-                <span class="lock-badge-dot"></span>
-                <span>STUDIO LOCK</span>
-            </div>
             <a href="index.html" class="lock-back-link">← Back to Portfolio</a>
         </div>
 
         <div class="lock-body">
-            <div class="lock-header">
-                <div class="lock-clock" id="lock-clock">12:00</div>
-                <h1 class="lock-title">Enter Studio PIN</h1>
-                <p class="lock-subtitle" id="lock-subtitle">Editorial Content Manager</p>
-            </div>
-
             <!-- Morphing PIN Dots -->
             <div class="pin-dots-stage" id="pin-dots-stage" aria-label="PIN progress"></div>
 
@@ -1259,8 +1174,6 @@ $pinLength = (int)($authConfig['pin_length'] ?? 4);
                 </button>
             </div>
         </div>
-
-        <div class="lock-footer">PNAM // @FRESHEBRED CMS</div>
     </section>
 
     <!-- ==========================================================
@@ -1337,18 +1250,7 @@ $pinLength = (int)($authConfig['pin_length'] ?? 4);
         let isDirty = false;
         let pendingUploadCallback = null;
 
-        // 1. Live Clock on Lock Screen
-        function updateClock() {
-            const now = new Date();
-            const hh = String(now.getHours()).padStart(2, '0');
-            const mm = String(now.getMinutes()).padStart(2, '0');
-            const el = document.getElementById('lock-clock');
-            if (el) el.textContent = `${hh}:${mm}`;
-        }
-        updateClock();
-        setInterval(updateClock, 10000);
-
-        // 2. Render Morphing PIN Slots
+        // 1. Render Morphing PIN Slots
         function renderPinSlots() {
             const stage = document.getElementById('pin-dots-stage');
             stage.innerHTML = '';
@@ -1402,9 +1304,6 @@ $pinLength = (int)($authConfig['pin_length'] ?? 4);
 
         function pressDigit(digit) {
             if (isVerifyingPin || currentPin.length >= 8) return;
-            const subtitle = document.getElementById('lock-subtitle');
-            subtitle.classList.remove('error');
-            subtitle.textContent = 'Editorial Content Manager';
 
             currentPin += digit;
             updatePinUI(currentPin.length - 1);
@@ -1424,7 +1323,6 @@ $pinLength = (int)($authConfig['pin_length'] ?? 4);
             if (isVerifyingPin || currentPin.length === 0) return;
             isVerifyingPin = true;
             const stage = document.getElementById('pin-dots-stage');
-            const subtitle = document.getElementById('lock-subtitle');
 
             try {
                 const res = await fetch('cms.php?action=login', {
@@ -1443,16 +1341,16 @@ $pinLength = (int)($authConfig['pin_length'] ?? 4);
                     stage.classList.remove('shake');
                     void stage.offsetWidth;
                     stage.classList.add('shake');
-                    subtitle.textContent = data.error || 'Incorrect PIN';
-                    subtitle.classList.add('error');
+                    if (res.status === 429 && data.error) {
+                        showToast(data.error);
+                    }
                     setTimeout(() => {
                         currentPin = '';
                         updatePinUI();
                     }, 320);
                 }
             } catch (e) {
-                subtitle.textContent = 'Connection error';
-                subtitle.classList.add('error');
+                showToast('Connection error');
             } finally {
                 isVerifyingPin = false;
             }
