@@ -265,14 +265,53 @@ function renderContact() {
                     </div>
                 </div>
             </div>
+            <div class="contact-actions">
+                <div class="gcal-btn-wrapper">
+                    <span id="gcal-scheduling-target"></span>
+                </div>
+                <a href="https://myclientportal.top" target="_blank" rel="noopener noreferrer" class="contact-portal-btn">
+                    <span>Go to MyClientPortal</span>
+                    <span class="portal-btn-arrow">↗</span>
+                </a>
+            </div>
             <div class="arrow-container">
                 <canvas id="arrow-canvas"></canvas>
             </div>
         </div>
     `;
 
+    initGoogleCalendarButton();
     setTimeout(resizeWordArt, 100);
     window.addEventListener('resize', resizeWordArt);
+}
+
+function initGoogleCalendarButton() {
+    const target = document.getElementById('gcal-scheduling-target');
+    if (!target) return;
+
+    const loadBtn = () => {
+        if (window.calendar && window.calendar.schedulingButton) {
+            window.calendar.schedulingButton.load({
+                url: 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ0sqrVQkdefjddPW4JsV94OcER0yjaUYFRaF3lZZQmqqtBwZTrFmOvWEd12oFdV-5vY4dVxiLaz?gv=true',
+                color: '#039BE5',
+                label: 'Book an appointment',
+                target,
+            });
+            return true;
+        }
+        return false;
+    };
+
+    if (!loadBtn()) {
+        window.addEventListener('load', loadBtn);
+        let attempts = 0;
+        const interval = setInterval(() => {
+            attempts++;
+            if (loadBtn() || attempts > 50) {
+                clearInterval(interval);
+            }
+        }, 100);
+    }
 }
 
 function resizeWordArt() {

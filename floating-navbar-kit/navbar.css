@@ -1,0 +1,255 @@
+/* ==========================================================================
+   Floating Auto-Retracting Glass Navbar (with Liquid Blob & Swipe Mini-Pill)
+   Extracted from Portfolio — Drop-in Stylesheet
+   ========================================================================== */
+
+:root {
+    /* Core Navbar Design Tokens (override these in your own CSS if desired) */
+    --nav-bg: rgba(10, 10, 10, 0.4);
+    --nav-text-color: #ededed;
+    --nav-active-text-color: #000000;
+    --nav-blob-color: #ededed;
+    --nav-glass-border: rgba(255, 255, 255, 0.1);
+    --nav-hover-border: rgba(255, 255, 255, 0.3);
+    --nav-scaled-border: rgba(255, 255, 255, 0.4);
+    --nav-scaled-glow: rgba(255, 255, 255, 0.2);
+    --nav-blur: 12px;
+    --nav-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+    /* Signature liquid spring/overshoot easing */
+    --ease-custom: cubic-bezier(.44, -0.08, 0, 1.38);
+    --ease-smooth: ease-in-out;
+}
+
+/* Utility class used before initialization */
+.hidden {
+    display: none !important;
+}
+
+/* ================= NAVBAR CONTAINER ================= */
+
+#navbar {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    max-width: 95vw;
+    z-index: 100;
+    white-space: nowrap;
+    box-sizing: border-box;
+    font-family: var(--nav-font);
+
+    /* Glassmorphism */
+    background: var(--nav-bg);
+    backdrop-filter: blur(var(--nav-blur));
+    -webkit-backdrop-filter: blur(var(--nav-blur));
+    border: 1px solid var(--nav-glass-border);
+    border-radius: 50px;
+    padding: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    transition:
+        transform 0.4s var(--ease-custom),
+        width 0.4s var(--ease-custom),
+        height 0.4s var(--ease-custom),
+        padding 0.4s var(--ease-custom),
+        border-radius 0.4s var(--ease-custom),
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+/* Click "squeeze" flash state */
+#navbar.scaled {
+    transform: translateX(-50%) scale(1.05);
+    border-color: var(--nav-scaled-border);
+    box-shadow: 0 0 20px var(--nav-scaled-glow);
+}
+
+#navbar:hover {
+    border-color: var(--nav-hover-border);
+}
+
+/* Liquid scale effect for highlight blob on click */
+#navbar.scaled #nav-blob {
+    transform: scale(1.1);
+    opacity: 1;
+    filter: brightness(1.2);
+}
+
+/* ================= NAV ITEMS LIST (EXPANDED) ================= */
+
+#nav-list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.25s ease, transform 0.35s var(--ease-custom);
+}
+
+/* Hide full item list when collapsed into mini pill (kept in DOM for size measurement) */
+#navbar.mini:not(.expanded-hover) #nav-list {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.92);
+}
+
+.nav-item {
+    cursor: pointer;
+    padding: 10px 20px;
+    margin: 0;
+    box-sizing: border-box;
+    color: var(--nav-text-color);
+    font-size: 14px;
+    font-weight: 500;
+    position: relative;
+    transition: color 0.3s;
+    white-space: nowrap;
+    z-index: 2; /* Ensure text sits above #nav-blob */
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.nav-item.active {
+    color: var(--nav-active-text-color);
+}
+
+/* ================= SLIDING HIGHLIGHT BLOB ================= */
+
+#nav-blob {
+    position: absolute;
+    background: var(--nav-blob-color);
+    border-radius: 40px;
+    z-index: 1;
+    opacity: 0.9;
+    pointer-events: none;
+    transition:
+        transform 0.5s var(--ease-custom),
+        width 0.5s var(--ease-custom),
+        height 0.5s var(--ease-custom),
+        top 0.5s var(--ease-custom),
+        left 0.5s var(--ease-custom),
+        opacity 0.25s ease;
+}
+
+#navbar.mini:not(.expanded-hover) #nav-blob {
+    opacity: 0;
+}
+
+/* ================= RETRACTED MINI PILL STATE ================= */
+
+#navbar.mini {
+    padding: 5px 15px;
+    border-radius: 30px;
+}
+
+#navbar.expanded-hover {
+    padding: 10px;
+    border-radius: 50px;
+}
+
+#nav-mini-text {
+    position: absolute;
+    color: var(--nav-text-color);
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(0) scale(0.9);
+    filter: blur(4px);
+    user-select: none;
+    transition:
+        transform 0.3s var(--ease-custom),
+        opacity 0.25s ease,
+        filter 0.25s ease;
+}
+
+#navbar.mini:not(.expanded-hover) #nav-mini-text {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0) scale(1);
+    filter: blur(0);
+}
+
+/* ================= OPTIONAL: AMBIENT BACKGROUND BLOBS & GRAIN ================= */
+/* Remove or omit #background-container in HTML if you only want the navbar */
+
+#background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.grain-overlay {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+}
+
+#blobs-container {
+    position: absolute;
+    inset: 0;
+    filter: blur(80px);
+}
+
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: nav-blob-drift 20s infinite alternate ease-in-out;
+    transition: translate 0.25s ease-out;
+    will-change: transform, translate;
+}
+
+.blob-1 {
+    width: 400px;
+    height: 400px;
+    background: #4a4a4a;
+    top: 10%;
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.blob-2 {
+    width: 300px;
+    height: 300px;
+    background: #2a2a2a;
+    bottom: 20%;
+    right: 10%;
+    animation-delay: -5s;
+}
+
+.blob-3 {
+    width: 250px;
+    height: 250px;
+    background: #5a5a5a;
+    top: 40%;
+    left: 60%;
+    animation-delay: -10s;
+}
+
+@keyframes nav-blob-drift {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+    100% {
+        transform: translate(30px, -50px) scale(1.1);
+    }
+}

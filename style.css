@@ -1074,9 +1074,87 @@ html.lenis body {
     line-height: 0.8;
 }
 
+.contact-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 28px;
+    z-index: 2;
+}
+
+.gcal-btn-wrapper {
+    display: flex;
+    width: 100%;
+}
+
+.gcal-btn-wrapper .qxCTlb {
+    width: 100%;
+    min-height: 44px;
+    padding: 12px 22px !important;
+    border-radius: 50px !important;
+    font-family: var(--font-body) !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.03em !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease, filter 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gcal-btn-wrapper .qxCTlb:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+    box-shadow: 0 6px 20px rgba(3, 155, 229, 0.35);
+}
+
+.contact-portal-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 44px;
+    padding: 12px 22px;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+}
+
+.portal-btn-arrow {
+    display: inline-block;
+    font-size: 1.05rem;
+    line-height: 1;
+    transition: transform 0.3s ease;
+}
+
+.contact-portal-btn:hover {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+    transform: translateY(-2px);
+}
+
+.contact-portal-btn:hover .portal-btn-arrow {
+    transform: translate(3px, -3px);
+}
+
 .arrow-container {
-    margin-top: 40px;
-    height: 150px;
+    margin-top: 24px;
+    height: 120px;
     width: 100%;
     position: relative;
     display: flex;
@@ -1377,7 +1455,8 @@ h4 {
     }
 
     /* Allow Word Art to scale safely */
-    .word-art {
+    .word-art,
+    .contact-actions {
         max-width: 100%;
     }
 

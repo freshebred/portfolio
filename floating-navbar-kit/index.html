@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floating Auto-Retracting Navbar — Demo</title>
+
+    <!-- Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- 1. Include Navbar Stylesheet -->
+    <link rel="stylesheet" href="navbar.css">
+
+    <!-- Demo Page Layout Styles (only for this demo page) -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0a0a0a;
+            color: #ededed;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .section {
+            min-height: 100vh;
+            padding: 120px 24px 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .demo-card {
+            max-width: 680px;
+            background: rgba(20, 20, 20, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 48px 40px;
+        }
+
+        .demo-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            margin-bottom: 20px;
+        }
+
+        .demo-card h1,
+        .demo-card h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .demo-card p {
+            color: rgba(237, 237, 237, 0.78);
+            line-height: 1.65;
+            font-size: 1.05rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Optional: Ambient Drifting Blobs & Grain Background -->
+    <div id="background-container">
+        <div class="grain-overlay"></div>
+        <div id="blobs-container">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+        </div>
+    </div>
+
+    <!-- 2. Floating Auto-Retracting Navbar -->
+    <nav id="navbar">
+        <ul id="nav-list">
+            <!-- Sliding highlight blob MUST be inside #nav-list -->
+            <div id="nav-blob"></div>
+            <li class="nav-item" data-target="hero">Home</li>
+            <li class="nav-item" data-target="projects">Projects</li>
+            <li class="nav-item" data-target="about">About</li>
+            <li class="nav-item" data-target="contact">Contact</li>
+        </ul>
+        <div id="nav-mini-text" class="hidden"></div>
+    </nav>
+
+    <!-- 3. Page Sections (matched via id="..." and .section class) -->
+    <main>
+        <section id="hero" class="section">
+            <div class="demo-card">
+                <span class="demo-badge">Section 01 &bull; Expanded Top State</span>
+                <h1>Floating Glass Navbar</h1>
+                <p>
+                    Scroll down past <strong>100px</strong> to watch the navbar retract into a compact mini-pill.
+                    Hover (or tap on mobile) over the mini-pill at any time to smoothly expand it back out.
+                </p>
+            </div>
+        </section>
+
+        <section id="projects" class="section">
+            <div class="demo-card">
+                <span class="demo-badge">Section 02 &bull; Auto-Retracted Mini State</span>
+                <h2>Projects</h2>
+                <p>
+                    Notice how the mini-pill swipes and morphs its width to fit the active section title as you scroll
+                    across sections, using a custom spring cubic-bezier easing.
+                </p>
+            </div>
+        </section>
+
+        <section id="about" class="section">
+            <div class="demo-card">
+                <span class="demo-badge">Section 03 &bull; Liquid Blob Highlight</span>
+                <h2>About</h2>
+                <p>
+                    Hover over the navbar pill above and click any item to see the liquid squeeze flash
+                    (<code>.scaled</code>) and smooth scroll lock in action.
+                </p>
+            </div>
+        </section>
+
+        <section id="contact" class="section">
+            <div class="demo-card">
+                <span class="demo-badge">Section 04 &bull; Drop-in Ready</span>
+                <h2>Contact</h2>
+                <p>
+                    Copy <code>navbar.css</code> and <code>navbar.js</code> into your next project to reproduce this
+                    exact navbar in seconds. See <code>README.md</code> for customization options.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- 4. Include Navbar Script -->
+    <script src="navbar.js"></script>
+</body>
+
+</html>
