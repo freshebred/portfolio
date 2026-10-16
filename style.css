@@ -1111,6 +1111,30 @@ html.lenis body {
     box-shadow: 0 6px 20px rgba(3, 155, 229, 0.35);
 }
 
+/* Google Calendar Popup Modal & Iframe Fixes */
+.hur54b {
+    background-color: rgba(0, 0, 0, 0.75) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 9999 !important;
+}
+
+.mmGMM,
+.hur54b iframe,
+iframe[src*="calendar.google.com"] {
+    background-color: #ffffff !important;
+    color-scheme: light !important;
+    border-radius: 12px !important;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6) !important;
+    opacity: 1 !important;
+}
+
+@media (max-width: 768px) {
+    .hur54b {
+        padding: 48px 16px 16px !important;
+    }
+}
+
 .contact-portal-btn {
     display: inline-flex;
     align-items: center;
